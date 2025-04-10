@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stockit</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #f9f9f9;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 400px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .results {
+            margin-top: 40px;
+        }
+
+        .chart {
+            margin-bottom: 30px;
+        }
+
+        img {
+            max-width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📈 Stock Prediction App</h1>
+
+    <form method="post">
+        <label for="stock">Stock Symbol:</label>
+        <input type="text" name="stock" id="stock" required>
+
+        <label for="interval">Interval:</label>
+        <input type="text" name="interval" id="interval" required>
+
+        <label for="window">Window:</label>
+        <input type="number" name="window" id="window" required>
+
+        <input type="submit" value="Predict">
+    </form>
+
+    <div class="results">
+        {% if predictions %}
+            <h2>🧠 Predictions:</h2>
+            <ul>
+                {% for pred in predictions %}
+                    <li>{{ pred }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if chart_paths %}
+            <h2>📊 Charts:</h2>
+            {% for path in chart_paths %}
+                <div class="chart">
+                    <img src="{{ path }}" alt="Chart">
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+</body>
+</html>
