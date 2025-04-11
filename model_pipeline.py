@@ -17,10 +17,9 @@ def run_model(stock_name, interval, window):
 
 
     # Initialize Alpha Vantage API
-    
-   API_KEY = os.environ.get("ALPHA_VANTAGE_API_KEY")
+    API_KEY = os.environ.get("ALPHA_VANTAGE_API_KEY")
     print("💡 API Key used (trimmed):", API_KEY[:6] if API_KEY else "❌ Not found")
-    
+
     if not API_KEY:
         raise EnvironmentError("❌ ALPHA_VANTAGE_API_KEY is not set in environment variables.")
     
@@ -43,7 +42,7 @@ def run_model(stock_name, interval, window):
             except ValueError as e:
                 print(f"⚠ API Error: {e} | Attempt {attempt + 1}/2")
                 if attempt < 1:
-                    time.sleep(45)
+                    time.sleep(60)
     
         print("❌ Failed to retrieve data after multiple attempts.")
         return None
@@ -55,6 +54,7 @@ def run_model(stock_name, interval, window):
         raise RuntimeError("❌ Stock data could not be retrieved. Aborting.")
     
     data.columns = ["Open", "High", "Low", "Close", "Volume"]
+
 
 
     # Print sample data
