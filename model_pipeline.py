@@ -17,7 +17,7 @@ def run_model(stock_name, interval, window):
 
 
     # Initialize Alpha Vantage API
-    API_KEY = "JA8LGGRXPBABCFOA"
+    API_KEY = "LXPW27XHTU181BV3"
     ts = TimeSeries(key=API_KEY, output_format="pandas")
 
     def fetch_stock_data(ts, symbol, interval):
