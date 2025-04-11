@@ -18,7 +18,8 @@ def run_model(stock_name, interval, window):
 
     # Initialize Alpha Vantage API
     
-    API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
+    API_KEY = os.environ.get("ALPHA_VANTAGE_API_KEY")
+    print("💡 API Key used (trimmed):", API_KEY[:6] if API_KEY else "❌ Not found")
 
     ts = TimeSeries(key=API_KEY, output_format="pandas")
 
