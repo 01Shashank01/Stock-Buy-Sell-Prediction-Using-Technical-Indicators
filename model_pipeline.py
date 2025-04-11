@@ -41,6 +41,8 @@ def run_model(stock_name, interval, window):
         # ❌ All attempts failed
         print("❌ Failed to retrieve data after multiple attempts.")
         return None
+    # Call data fetcher
+    data = fetch_stock_data(ts, symbol, interval)
                                                                                                                                                       # Rename columns
     data.columns = ["Open", "High", "Low", "Close", "Volume"]
 
