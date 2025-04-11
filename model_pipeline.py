@@ -20,25 +20,28 @@ def run_model(stock_name, interval, window):
     API_KEY = "PWYK7KZGORDUBWNX"
     ts = TimeSeries(key=API_KEY, output_format="pandas")
 
-    # Fetch data with retries
-    for attempt in range(2):
-        try:
-            if interval == "1d":
-                data, meta_data = ts.get_daily(symbol=symbol, outputsize="full")
-            else:
-                data, meta_data = ts.get_intraday(symbol=symbol, interval=interval, outputsize="full")
-
-            # If the API returned empty data, retry
-            if data.empty:
-                raise ValueError("No data received. Retrying...")
-
-            break  # Exit loop if successful
-        except ValueError as e:
-            print(f"⚠ API Error: {e} Retrying in 60 seconds...")
-            time.sleep(60)
-    else:
+    def fetch_stock_data(ts, symbol, interval):
+        for attempt in range(2):
+            try:
+                if interval == "1d":
+                    data, meta_data = ts.get_daily(symbol=symbol, outputsize="full")
+                else:
+                    data, meta_data = ts.get_intraday(symbol=symbol, interval=interval, outputsize="full")
+    
+                if data.empty:
+                    raise ValueError("No data received. Retrying...")
+    
+                return data  # ✅ Successfully fetched data
+    
+            except ValueError as e:
+                print(f"⚠ API Error: {e} | Attempt {attempt + 1}/2")
+                if attempt < 1:
+                    time.sleep(60)  # Retry after delay
+    
+        # ❌ All attempts failed
         print("❌ Failed to retrieve data after multiple attempts.")
-        exit()                                                                                                                                                           # Rename columns
+        return None
+                                                                                                                                                      # Rename columns
     data.columns = ["Open", "High", "Low", "Close", "Volume"]
 
     # Print sample data
