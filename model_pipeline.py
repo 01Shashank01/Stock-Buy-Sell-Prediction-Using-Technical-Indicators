@@ -17,7 +17,7 @@ def run_model(stock_name, interval, window):
 
 
     # Initialize Alpha Vantage API
-    API_KEY ="WFM4LYV1IF7BCISE"
+    API_KEY =ALPHA_VANTAGE_API_KEY
     print("💡 API Key used (trimmed):", API_KEY[:6] if API_KEY else "❌ Not found")
 
     if not API_KEY:
