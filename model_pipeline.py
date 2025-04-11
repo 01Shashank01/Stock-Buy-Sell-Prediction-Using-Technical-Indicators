@@ -95,47 +95,7 @@ def run_model(stock_name, interval, window):
     print(final_data.tail())
 
 
-    # Step 12: Create sequences for LSTM
-    def create_sequences(data, target, sequence_length):
-        x, y = [], []
-        for i in range(sequence_length, len(data)):
-            x.append(data[i-sequence_length:i])  # Collect past sequence_length rows
-            y.append(target[i])  # Predict the corresponding target
-        return np.array(x), np.array(y)
-
-    # Set the sequence length
-    sequence_length = 60
-
-    # Prepare sequences
-    x, y = create_sequences(scaled_features, scaled_target, sequence_length)
-
-    # Split data into training and testing sets (80-20 split)
-    train_size = int(0.8 * len(x))
-    x_train, x_test = x[:train_size], x[train_size:]
-    y_train, y_test = y[:train_size], y[train_size:]
-
-    # Step 13: Build the LSTM model
-    model = Sequential([
-        LSTM(50, return_sequences=True, input_shape=(sequence_length, x_train.shape[2])),
-        Dropout(0.2),  # Prevent overfitting
-        LSTM(50, return_sequences=False),
-        Dropout(0.2),
-        Dense(25, activation='relu'),  # Dense layer for non-linear transformations
-        Dense(1)  # Output layer to predict the 'Close' price
-    ])
-
-    # Compile the model
-    model.compile(optimizer='adam', loss='mean_squared_error')
-
-    # Train the model
-    history = model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=20, batch_size=32)
-
-    # Step 14: Evaluate the model
-    y_pred_scaled = model.predict(x_test)  # Predict on the scaled test data
-
-    # Inverse transform predictions and actual values for evaluation
-    y_pred = scaler_target.inverse_transform(y_pred_scaled)  # Inverse transform predictions
-    y_actual = scaler_target.inverse_transform(y_test)  # Inverse transform actual values                                               # Compute Moving Average and Standard Deviation
+     # Compute Moving Average and Standard Deviation
 
 
     data['SMA'] = data['Close'].rolling(window=window).mean()                                                                 # Step 1: Calculate MACD Components
