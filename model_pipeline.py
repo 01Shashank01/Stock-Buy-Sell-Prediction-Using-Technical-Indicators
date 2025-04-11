@@ -18,11 +18,14 @@ def run_model(stock_name, interval, window):
 
     # Initialize Alpha Vantage API
     
-    API_KEY = os.environ.get("ALPHA_VANTAGE_API_KEY")
+   API_KEY = os.environ.get("ALPHA_VANTAGE_API_KEY")
     print("💡 API Key used (trimmed):", API_KEY[:6] if API_KEY else "❌ Not found")
-
+    
+    if not API_KEY:
+        raise EnvironmentError("❌ ALPHA_VANTAGE_API_KEY is not set in environment variables.")
+    
     ts = TimeSeries(key=API_KEY, output_format="pandas")
-
+    
     def fetch_stock_data(ts, symbol, interval):
         for attempt in range(2):
             try:
@@ -34,20 +37,25 @@ def run_model(stock_name, interval, window):
                 if data.empty:
                     raise ValueError("No data received. Retrying...")
     
-                return data  # ✅ Successfully fetched data
+                print("✅ Sample data received:\n", data.head())
+                return data  # ✅ Success
     
             except ValueError as e:
                 print(f"⚠ API Error: {e} | Attempt {attempt + 1}/2")
                 if attempt < 1:
-                    time.sleep(60)  # Retry after delay
+                    time.sleep(45)
     
-        # ❌ All attempts failed
         print("❌ Failed to retrieve data after multiple attempts.")
         return None
-    # Call data fetcher
+    
+    # Fetch and validate
     data = fetch_stock_data(ts, symbol, interval)
-                                                                                                                                                      # Rename columns
+    
+    if data is None:
+        raise RuntimeError("❌ Stock data could not be retrieved. Aborting.")
+    
     data.columns = ["Open", "High", "Low", "Close", "Volume"]
+
 
     # Print sample data
     print("✅ Downloaded Data:")
