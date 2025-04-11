@@ -4,8 +4,6 @@ def run_model(stock_name, interval, window):
     from sklearn.preprocessing import MinMaxScaler
     from sklearn.metrics import mean_squared_error
     import matplotlib.pyplot as plt
-    from tensorflow.keras.models import Sequential
-    from tensorflow.keras.layers import LSTM, Dense, Dropout
     from alpha_vantage.timeseries import TimeSeries
     import time                                                                                                                                                          # User Inputs
     import os
