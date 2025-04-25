@@ -181,8 +181,18 @@
       <input type="submit" value="🔍 Predict">
     </form>
 
+
 <!-- Inside .results -->
 <div class="results">
+  {% if predictions %}
+    <h2>📈 Predictions:</h2>
+    <ul>
+      {% for pred in predictions %}
+        <li>{{ pred }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
   {% if chart_paths %}
     <h2>📊 Charts:</h2>
 
@@ -192,7 +202,7 @@
       <li>{{ predictions[7] }}</li>
     </ul>
 
-    <!-- Chart 1 and its prediction -->
+    <!-- Chart 1 and its predictions -->
     <div class="chart">
       <img src="{{ chart_paths[0] }}" alt="Chart 1">
       <ul>
@@ -212,7 +222,7 @@
       </ul>
     </div>
 
-    <!-- Chart 3 and its prediction -->
+    <!-- Chart 3 and its predictions -->
     <div class="chart">
       <img src="{{ chart_paths[2] }}" alt="Chart 3">
       <ul>
@@ -222,6 +232,7 @@
     </div>
   {% endif %}
 </div>
+
 
 
 </body>
