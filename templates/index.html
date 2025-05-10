@@ -1,3 +1,162 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stockit - AI Powered Financial Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    /* Your existing styles remain unchanged */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #f0f0f0;
+      overflow-x: hidden;
+    }
+    #splash {
+      position: fixed; top: 0; left: 0; height: 100vh; width: 100vw;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 9999;
+      animation: fadeOut 2s ease 2s forwards;
+    }
+    #splash img { width: 100px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); animation: scaleUp 1.2s ease; }
+    @keyframes scaleUp { from {transform: scale(0.5);opacity:0;} to {transform: scale(1);opacity:1;} }
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+    .container {
+      max-width: 700px; margin: 100px auto; padding: 40px;
+      background: rgba(20, 20, 40, 0.8); border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    h1 { text-align: center; margin-bottom: 40px; font-size: 2rem; font-weight: 600; }
+    h1 img { width: 36px; vertical-align: middle; margin-right: 10px; }
+    label { display: block; margin-top: 20px; margin-bottom: 6px; font-weight: 500; font-size: 0.95rem; }
+    input[type="text"], input[type="number"], select {
+      width: 100%; padding: 12px; border-radius: 10px;
+      border: 1px solid #444; background: #1e1e2e; color: #fff;
+      font-size: 1rem; transition: border 0.3s ease;
+    }
+    input[type="submit"] {
+      margin-top: 30px; width: 100%; padding: 14px;
+      background-color: #2962FF; border: none; border-radius: 12px;
+      color: #fff; font-size: 1.1rem; font-weight: 600;
+      cursor: pointer; transition: background-color 0.3s ease;
+    }
+    input[type="submit"]:hover { background-color: #0039cb; }
+    .results { margin-top: 40px; }
+    .results h2 { margin-bottom: 15px; font-size: 1.2rem; border-bottom: 1px solid #444; padding-bottom: 6px; }
+    ul { padding-left: 20px; list-style: disc; }
+    li { margin-bottom: 10px; }
+    .chart { margin-top: 25px; }
+    .chart-container { margin-bottom: 40px; }
+  </style>
+</head>
+<body>
+
+ 
+<div id="splash">
+  <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width: 240px;">
+</div>
+
+ 
+<div class="container" id="main-content">
+  <h1><img src="{{ url_for('static', filename='images/logo1.png') }}">Stockit - AI Powered Financial Predictor</h1>
+
+  <form id="predict-form">
+    <label for="stock">Stock Symbol:</label>
+    <input type="text" id="stock" required>
+
+    <label for="interval">Interval:</label>
+    <input type="text" id="interval" required>
+
+    <label for="window">Window Size:</label>
+    <input type="number" id="window" required>
+
+    <label for="selected_indicators">Select Indicators:</label>
+    <select id="selected_indicators" multiple required>
+      <option value="rsi">RSI</option>
+      <option value="MACD">MACD</option>
+      <option value="bollinger">Bollinger Bands</option>
+      <option value="adx">ADX</option>
+      <option value="support_resistance">Support & Resistance</option>
+    </select>
+    <small>Hold Ctrl (Windows) or Command (Mac) to select multiple indicators.</small>
+
+    <input type="submit" value="🔍 Predict">
+  </form>
+
+  <div id="results" class="results"></div>
+</div>
+
+<script>
+  const socket = io();
+  const form = document.getElementById('predict-form');
+  const resultsDiv = document.getElementById('results');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const stock = document.getElementById('stock').value;
+    const interval = document.getElementById('interval').value;
+    const window = document.getElementById('window').value;
+    const selected = Array.from(document.getElementById('selected_indicators').selectedOptions).map(opt => opt.value);
+
+    resultsDiv.innerHTML = '<p>Loading predictions...</p>';
+
+    socket.emit('run_model_event', {
+      stock, interval, window, selected_indicators: selected
+    });
+  });
+
+  socket.on('model_response', data => {
+    if (!data.success) {
+      resultsDiv.innerHTML = `<p style="color:red;">${data.error}</p>`;
+      return;
+    }
+  
+    const { global_info, charts_and_predictions } = data;
+    let html = `<h2>📊 Charts:</h2><ul>`;
+    html += global_info.map(item => `<li>${item}</li>`).join('');
+    html += `</ul>`;
+  
+    // For each chart/pred-group pair
+    charts_and_predictions.forEach(( [chart, preds], i) => {
+      // if `chart` is an object, it's a Plotly figure
+      if (typeof chart === 'object') {
+        html += `
+          <div class="chart" id="chart-${i}">
+            <ul>${preds.map(p=>`<li>${p}</li>`).join('')}</ul>
+          </div>`;
+      } else {
+        // fallback for static images (if you ever go back to those)
+        html += `
+          <div class="chart">
+            <img src="${chart}" /><ul>${preds.map(p=>`<li>${p}</li>`).join('')}</ul>
+          </div>`;
+      }
+    });
+  
+    resultsDiv.innerHTML = html;
+  
+    // Now render all the dynamic charts
+    charts_and_predictions.forEach(( [chart,_], i) => {
+      if (typeof chart === 'object') {
+        Plotly.newPlot(`chart-${i}`, chart.data, chart.layout, {
+          paper_bgcolor: '#1e1e2e',
+          plot_bgcolor:  '#1e1e2e',
+          font: { color: '#fff' }
+        });
+      }
+    });
+  });
+  
+</script>
+
+</body>
+</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
